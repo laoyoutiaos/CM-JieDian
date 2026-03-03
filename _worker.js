@@ -2069,7 +2069,14 @@ async function 反代参数获取(request) {
     // ==================== 第三步：处理路径中的 proxyip/pyip/ip ====================
     else if ((proxyMatch = pathLower.match(/\/(proxyip[.=]|pyip=|ip=)([^?#\s]+)/))) {
         let 路参IP = 提取路径值(proxyMatch[2]);
-        // proxyip 值以 socks5:// 或 http:// 开头，视为对应协议处理
+        // --- 新增逻辑：处理逗号分隔的多域名 ---
+    	if (路参IP.includes(',')) {
+        	const ipArray = 路参IP.split(',');
+        	// 随机选择一个域名，或者用 [0] 选择第一个
+        	路参IP = ipArray[Math.floor(Math.random() * ipArray.length)].trim();
+    	}
+		
+		// proxyip 值以 socks5:// 或 http:// 开头，视为对应协议处理
         if (!解析代理URL(路参IP)) {
             // 否则作为 IP 反代
             反代IP = 路参IP;
@@ -2460,3 +2467,4 @@ async function html1101(host, 访问IP) {
 </body>
 </html>`;
 }
+
