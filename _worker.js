@@ -201,7 +201,7 @@ export default {
                     }
 
                     ctx.waitUntil(请求日志记录(env, request, 访问IP, 'Admin_Login', config_JSON));
-                    return fetch(Pages静态页面 + '/admin');
+                    return fetch(Pages静态页面 + '/admin' + url.search);
                 } else if (访问路径 === 'logout' || uuidRegex.test(访问路径)) {//清除cookie并跳转到登录页面
                     const 响应 = new Response('重定向中...', { status: 302, headers: { 'Location': '/login' } });
                     响应.headers.set('Set-Cookie', 'auth=; Path=/; Max-Age=0; HttpOnly');
@@ -2637,8 +2637,17 @@ async function 反代参数获取(request) {
         const 斜杠索引 = 协议拆分[1].indexOf('/');
         return 斜杠索引 > 0 ? `${协议拆分[0]}://${协议拆分[1].slice(0, 斜杠索引)}` : 值;
     };
-
-    const 查询反代IP = searchParams.get('proxyip');
+    // 👇 --- 这是你新增的：处理逗号多IP的辅助函数 --- 👇
+    const 随机抽取IP = (值) => {
+        if (值.includes(',')) {
+            const ipArray = 值.split(',');
+            return ipArray[Math.floor(Math.random() * ipArray.length)].trim();
+        }
+        return 值;
+    };    
+    // 注意：把原来的 const 查询反代IP 改成 let，方便重新赋值
+    let 查询反代IP = searchParams.get('proxyip');
+    // 👆 ------------------------------------------ 👆
     if (查询反代IP !== null) {
         if (!解析代理URL(查询反代IP)) return 设置反代IP(查询反代IP);
     } else {
